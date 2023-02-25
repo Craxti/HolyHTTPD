@@ -5,6 +5,7 @@ import threading
 import subprocess
 import scapy.all as scapy
 import pyshark
+import re
 
 
 # Fake filesystem options
