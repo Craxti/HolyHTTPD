@@ -14,6 +14,8 @@ fake_fs_files = {
     "public_file.txt": "This is a public file"
 }
 
+# Block for DoS-attack
+# subprocess.run(['sudo', 'iptables', '-A', 'INPUT', '-p', 'tcp', '--dport', '80', '-m', 'limit', '--limit', '10/second', '--limit-burst', '15', '-j', 'ACCEPT'])
 
 # Class for working with a fake file system
 class FakeFileSystem:
