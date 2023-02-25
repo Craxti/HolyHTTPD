@@ -45,6 +45,12 @@ class PacketSniffer:
     # Packet processing and attack detection
     def packet_callback(self, packet):
         logging.info("Packet received: %s", packet.summary())
+    
+    #scan nmap
+    def scan_ports_callback(self, packet):
+        payload = packet.payload.payload
+        if payload and "nmap" in payload.lower():
+            logging.warning("Port scanning detected: %s", payload)
 
     # Start the packet processing process in a separate thread
     def start(self):
