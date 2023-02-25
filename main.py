@@ -6,6 +6,7 @@ import subprocess
 import scapy.all as scapy
 import pyshark
 
+
 # Fake filesystem options
 fake_fs_path = "/tmp/fake_fs"
 fake_fs_files = {
@@ -207,20 +208,7 @@ class LogMonitor:
         self.path = path
         self.running = False
 
-    def monitor_logs(self):
-        wm = pyinotify.WatchManager()
-        mask = pyinotify.IN_MODIFY
-        handler = LogHandler()
-        notifier = pyinotify.Notifier(wm, handler)
 
-        wm.add_watch(self.path, mask, rec=True)
-
-        while self.running:
-            notifier.process_events()
-            if notifier.check_events():
-                notifier.read_events()
-
-        notifier.stop()
 
     def start(self):
         if not self.running:
@@ -232,7 +220,7 @@ class LogMonitor:
         self.running = False
         logging.info("Log monitor stopped")
 
-class LogHandler(pyinotify.ProcessEvent):
+class LogHandler():
     def process_IN_MODIFY(self, event):
         with open(event.pathname, "r") as f:
             content = f.read()
