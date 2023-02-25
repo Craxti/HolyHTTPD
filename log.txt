@@ -1,0 +1,3 @@
+INFO:root:Fake file system created
+INFO:root:Fake file system created
+INFO:root:Banner written to /tmp/fake_fs/banner.txt
