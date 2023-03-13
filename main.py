@@ -12,7 +12,7 @@ import re
 fake_fs_path = "/tmp/fake_fs"
 fake_fs_files = {
     "secret_file.txt": "This is a secret file",
-    "public_file.txt": "This is a public file"
+    "public_file.txt": "This is a public file",
 }
 
 # Block for DoS-attack
@@ -46,8 +46,8 @@ class PacketSniffer:
     # Packet processing and attack detection
     def packet_callback(self, packet):
         logging.info("Packet received: %s", packet.summary())
-    
-    #scan nmap
+
+    # scan nmap
     def scan_ports_callback(self, packet):
         payload = packet.payload.payload
         if payload and "nmap" in payload.lower():
@@ -101,11 +101,12 @@ def sanitize_sql_input(input_str):
 logging.basicConfig(filename="log.txt", level=logging.INFO)
 
 # Create an instance of the class to work with
-class Thread():
+class Thread:
     def handle_uploaded_file(self, file):
         with open(os.path.join("uploads", file.filename), "wb") as f:
             f.write(file.read())
         logging.info("File uploaded: %s", file.filename)
+
 
 class PortScanner:
     def __init__(self):
@@ -127,6 +128,7 @@ class PortScanner:
         self.running = False
         logging.info("Port scanner stopped")
 
+
 # Command execution function
 def execute_command(command):
     try:
@@ -146,18 +148,20 @@ class CommandShell:
     # Command processing function
     def process_command(self, command):
         if command == "help":
-            return "Available commands:\n" \
-                   "help - show this help\n" \
-                   "ls - show contents of the current directory\n" \
-                   "cd [directory] - change the current directory\n" \
-                   "cat [file] - show the contents of a file\n" \
-                   "rm [file] - delete a file\n" \
-                   "rmdir [directory] - delete a directory\n" \
-                   "ps - show running processes\n" \
-                   "kill [pid] - kill a process\n" \
-                   "ifconfig - show network interfaces\n" \
-                   "ping [host] - ping a host\n" \
-                   "curl [url] - download a file from a URL\n"
+            return (
+                "Available commands:\n"
+                "help - show this help\n"
+                "ls - show contents of the current directory\n"
+                "cd [directory] - change the current directory\n"
+                "cat [file] - show the contents of a file\n"
+                "rm [file] - delete a file\n"
+                "rmdir [directory] - delete a directory\n"
+                "ps - show running processes\n"
+                "kill [pid] - kill a process\n"
+                "ifconfig - show network interfaces\n"
+                "ping [host] - ping a host\n"
+                "curl [url] - download a file from a URL\n"
+            )
         elif command == "ls":
             return "\n".join(os.listdir(os.getcwd()))
         elif command.startswith("cd "):
@@ -189,13 +193,13 @@ class CommandShell:
             else:
                 return "rmdir: %s: No such file or directory" % directory
         elif command == "ps":
-            return str(subprocess.check_output("ps aux", shell=True), 'utf-8')
+            return str(subprocess.check_output("ps aux", shell=True), "utf-8")
         elif command.startswith("kill "):
             pid = command[5:]
             execute_command("kill -9 %s" % pid)
             return ""
         elif command == "ifconfig":
-            return str(subprocess.check_output("ifconfig", shell=True), 'utf-8')
+            return str(subprocess.check_output("ifconfig", shell=True), "utf-8")
         elif command.startswith("ping "):
             host = command[5:]
             return execute_command("ping -c 4 %s" % host)
@@ -212,12 +216,11 @@ class CommandShell:
             output = self.process_command(command.strip())
             print(output)
 
+
 class LogMonitor:
     def __init__(self, path):
         self.path = path
         self.running = False
-
-
 
     def start(self):
         if not self.running:
@@ -229,13 +232,22 @@ class LogMonitor:
         self.running = False
         logging.info("Log monitor stopped")
 
-class LogHandler():
+
+class LogHandler:
     def process_IN_MODIFY(self, event):
         with open(event.pathname, "r") as f:
             content = f.read()
             if "root" in content:
                 logging.warning("Root user accessed %s", event.pathname)
-                subprocess.Popen(["mail", "-s", "Warning: Root user activity detected", "admin@example.com"], stdin=subprocess.PIPE).communicate(content.encode())
+                subprocess.Popen(
+                    [
+                        "mail",
+                        "-s",
+                        "Warning: Root user activity detected",
+                        "admin@example.com",
+                    ],
+                    stdin=subprocess.PIPE,
+                ).communicate(content.encode())
 
 
 class WebServer:
@@ -262,26 +274,38 @@ class WebServer:
                 form = cgi.FieldStorage(
                     fp=self.rfile,
                     headers=self.headers,
-                    environ={'REQUEST_METHOD': 'POST',
-                             'CONTENT_TYPE': self.headers['Content-Type'],
-                             })
+                    environ={
+                        "REQUEST_METHOD": "POST",
+                        "CONTENT_TYPE": self.headers["Content-Type"],
+                    },
+                )
 
                 # Processing the uploaded file
-                if 'file' in form:
+                if "file" in form:
                     thread = Thread()
-                    thread.handle_uploaded_file(form['file'])
+                    thread.handle_uploaded_file(form["file"])
 
                     self.send_response(200)
-                    self.send_header('Content-Type', 'text/html')
+                    self.send_header("Content-Type", "text/html")
                     self.end_headers()
 
-                    self.wfile.write(bytes("<html><body><h1>File uploaded successfully</h1></body></html>", 'utf-8'))
+                    self.wfile.write(
+                        bytes(
+                            "<html><body><h1>File uploaded successfully</h1></body></html>",
+                            "utf-8",
+                        )
+                    )
                 else:
                     self.send_response(400)
-                    self.send_header('Content-Type', 'text/html')
+                    self.send_header("Content-Type", "text/html")
                     self.end_headers()
 
-                    self.wfile.write(bytes("<html><body><h1>Bad request: file not uploaded</h1></body></html>", 'utf-8'))
+                    self.wfile.write(
+                        bytes(
+                            "<html><body><h1>Bad request: file not uploaded</h1></body></html>",
+                            "utf-8",
+                        )
+                    )
 
         httpd = HTTPServer(("", self.port), RequestHandler)
         httpd.serve_forever()
@@ -289,7 +313,11 @@ class WebServer:
 
 if __name__ == "__main__":
     # init logs
-    logging.basicConfig(filename="app.log", level=logging.INFO, format="%(asctime)s %(levelname)s: %(message)s")
+    logging.basicConfig(
+        filename="app.log",
+        level=logging.INFO,
+        format="%(asctime)s %(levelname)s: %(message)s",
+    )
 
     # Creating a Fake File System
     fs = FakeFileSystem(fake_fs_path, fake_fs_files)
@@ -298,7 +326,9 @@ if __name__ == "__main__":
 
     # write banner
     write_banner(os.path.join(fake_fs_path, "banner.txt"), "Welcome to the website!")
-    write_banner(os.path.join("uploads", "banner.txt"), "This banner was uploaded by a user")
+    write_banner(
+        os.path.join("uploads", "banner.txt"), "This banner was uploaded by a user"
+    )
     logging.info("Banners written")
 
     # run web server
