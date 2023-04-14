@@ -4,6 +4,8 @@ import threading
 
 from scapy.all import sniff
 
+logging.basicConfig(filename='logs/packet_sniffer.log', level=logging.INFO)
+
 
 class PacketSniffer:
     def __init__(self, pcap_queue):
