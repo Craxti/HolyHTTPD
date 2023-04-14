@@ -36,6 +36,5 @@ def handle_pcap_file(pcap_file):
         logging.warning('Error processing pcap file %s', pcap_file)
 
 
-if __name__ == '__main__':
-    t = threading.Thread(target=pcap_parser)
-    t.start()
+t = threading.Thread(target=pcap_parser)
+t.start()
