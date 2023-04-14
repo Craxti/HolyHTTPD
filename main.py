@@ -127,7 +127,7 @@ if __name__ == '__main__':
             file_path = os.path.join('queue', file)
             # Определение типа файла (алерт или pcap)
             if file.endswith('.json'):
-                config['alert_queue'].put(file_path)
+                alert_queue.put(file_path)
             elif file.endswith('.pcap'):
                 pcap_queue.put(file_path)
             # Удаление обработанного файла из очереди
