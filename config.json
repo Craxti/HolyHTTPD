@@ -1,5 +1,9 @@
 {
     "host": "0.0.0.0",
     "port": 80,
-    "debug": true
+    "debug": true,
+    "alert_queue": "queue/alert",
+    "pcap_queue": [],
+    "alert_threads_num": 2
+
 }

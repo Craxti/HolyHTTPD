@@ -2,6 +2,7 @@ import json
 import logging
 import threading
 import pyshark
+import queue
 
 # Чтение конфигурационного файла
 with open('config.json') as f:
@@ -14,6 +15,16 @@ logging.basicConfig(filename='logs/pcap.log', level=logging.INFO)
 def pcap_parser():
     # Обработка файлов pcap
     while True:
+        # создать очередь
+        pcap_queue = queue.Queue()
+
+        # добавить элементы в очередь
+        pcap_queue.put('pcap/capture.pcap')
+
+        # передать очередь в config
+        config = {'pcap_queue': pcap_queue}
+
+        # получить элементы из очереди
         pcap_file = config['pcap_queue'].get()
         logging.info('Received pcap file %s', pcap_file)
         # Добавить обработку pcap-файла

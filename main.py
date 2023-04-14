@@ -27,7 +27,7 @@ with open('config.json') as f:
 logging.basicConfig(filename='logs/main.log', level=logging.INFO)
 
 # Очередь для обработки файлов pcap
-pcap_queue = queue.Queue()
+pcap_queue = queue.Queue(config['pcap_queue'])
 
 # Очередь для обработки алертов
 alert_queue = queue.Queue()
@@ -116,7 +116,7 @@ if __name__ == '__main__':
     t_pcap_parser.start()
 
     # Запуск сниффера сетевых пакетов
-    packet_sniffer = PacketSniffer(pcap_queue, alert_queue, True)
+    packet_sniffer = PacketSniffer(pcap_queue, alert_queue)
     packet_sniffer.start()
 
     # Бесконечный цикл для обработки файлов из директории очереди

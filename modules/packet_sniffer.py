@@ -8,7 +8,7 @@ logging.basicConfig(filename='logs/packet_sniffer.log', level=logging.INFO)
 
 
 class PacketSniffer:
-    def __init__(self, pcap_queue):
+    def __init__(self, pcap_queue, *args):
         self.pcap_queue = pcap_queue
         self.sniffing_thread = None
 
