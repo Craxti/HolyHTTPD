@@ -15,8 +15,9 @@ import scapy.all as scapy
 import pyshark
 
 from modules.alert_handler import alert_handler
-from modules.packet_sniffer import packet_sniffer
+from modules.packet_sniffer import PacketSniffer
 from modules.pcap_parser import pcap_parser
+
 
 # Чтение конфигурационного файла
 with open('config.json') as f:
@@ -28,6 +29,8 @@ logging.basicConfig(filename='logs/main.log', level=logging.INFO)
 # Очередь для обработки файлов pcap
 pcap_queue = queue.Queue()
 
+# Очередь для обработки алертов
+alert_queue = queue.Queue()
 
 class ThreadingSimpleServer(ThreadingMixIn, HTTPServer):
     pass
@@ -79,7 +82,7 @@ def start_server():
 def start_alert_handler():
     # Запуск обработчика алертов
     while True:
-        alert_file = config['alert_queue'].get()
+        alert_file = alert_queue.get()
         logging.info('Received alert file %s', alert_file)
         # Обработать алерт
         t = threading.Thread(target=alert_handler, args=(alert_file,))
@@ -89,7 +92,7 @@ def start_alert_handler():
 def start_pcap_parser():
     # Запуск парсера pcap-файлов
     while True:
-        pcap_file = config['pcap_queue'].get()
+        pcap_file = pcap_queue.get()
         logging.info('Received pcap file %s', pcap_file)
         # Обработать pcap-файл
         t = threading.Thread(target=pcap_parser, args=(pcap_file,))
@@ -113,8 +116,8 @@ if __name__ == '__main__':
     t_pcap_parser.start()
 
     # Запуск сниффера сетевых пакетов
-    t_packet_sniffer = threading.Thread(target=packet_sniffer, args=(pcap_queue,))
-    t_packet_sniffer.start()
+    packet_sniffer = PacketSniffer(pcap_queue, alert_queue, True)
+    packet_sniffer.start()
 
     # Бесконечный цикл для обработки файлов из директории очереди
     while True:
@@ -130,4 +133,3 @@ if __name__ == '__main__':
             # Удаление обработанного файла из очереди
             os.remove(file_path)
         time.sleep(1)
-
