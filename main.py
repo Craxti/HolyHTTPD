@@ -112,7 +112,7 @@ if __name__ == '__main__':
     t_alert_handler.start()
 
     # Запуск парсера pcap-файлов
-    t_pcap_parser = threading.Thread(target=start_pcap_parser)
+    t_pcap_parser = threading.Thread(target=pcap_parser, args=(pcap_queue,))
     t_pcap_parser.start()
 
     # Запуск сниффера сетевых пакетов

@@ -15,12 +15,12 @@ logging.basicConfig(filename='logs/pcap.log', level=logging.INFO)
 def pcap_parser(pcap_queue):
     # Обработка файлов pcap
     while True:
+        # получить элементы из очереди
         pcap_file = pcap_queue.get()
         logging.info('Received pcap file %s', pcap_file)
         # Добавить обработку pcap-файла
         t = threading.Thread(target=handle_pcap_file, args=(pcap_file,))
         t.start()
-
 
 
 def handle_pcap_file(pcap_file):

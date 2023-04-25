@@ -1,6 +1,7 @@
 import logging
 import queue
 import threading
+from pcap_parser import pcap_parser
 
 from scapy.all import sniff
 
@@ -18,6 +19,24 @@ class PacketSniffer:
                 target=self._sniff, args=(interface, filter))
             self.sniffing_thread.start()
             logging.info("Packet sniffing started")
+
+    def start(self):
+        # создать очередь
+        pcap_queue = queue.Queue()
+
+        # добавить элементы в очередь
+        pcap_queue.put('pcap/capture.pcap')
+
+        # передать очередь в config
+        config = {'pcap_queue': pcap_queue}
+
+        # получить элементы из очереди
+        pcap_file = config['pcap_queue'].get()
+        logging.info('Received pcap file %s', pcap_file)
+
+        # Добавить обработку pcap-файла
+        t = threading.Thread(target=pcap_parser, args=(pcap_file, pcap_queue,))
+        t.start()
 
     def stop_sniffing(self):
         if self.sniffing_thread is not None and self.sniffing_thread.is_alive():
