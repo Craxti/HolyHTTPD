@@ -117,7 +117,7 @@ if __name__ == '__main__':
 
     # Запуск сниффера сетевых пакетов
     packet_sniffer = PacketSniffer(pcap_queue, alert_queue)
-    packet_sniffer.start()
+    packet_sniffer.start_sniffing()
 
     # Бесконечный цикл для обработки файлов из директории очереди
     while True:
@@ -132,4 +132,3 @@ if __name__ == '__main__':
                 pcap_queue.put(file_path)
             # Удаление обработанного файла из очереди
             os.remove(file_path)
-        time.sleep(1)
