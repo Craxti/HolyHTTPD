@@ -26,7 +26,11 @@ pcap_queue = queue.Queue(config['pcap_queue'])
 alert_queue = queue.Queue()
 
 class ThreadingSimpleServer(ThreadingMixIn, HTTPServer):
-    pass
+    def __init__(self, *args, **kwargs):
+        self.is_running = False
+        super().__init__(*args, **kwargs)
+    def get_server_status(self):
+        return {"status": "running" if self.is_running else "stopped"}
 
 
 class RequestHandler(BaseHTTPRequestHandler):
@@ -67,13 +71,19 @@ def handle_post_request(request):
 
 
 def start_server():
-    # Запуск веб-сервера
+    # start_server
     server = ThreadingSimpleServer(('', config['port']), RequestHandler)
+    server.is_running = True
     server.serve_forever()
 
+def stop_server():
+    # stop_server
+    server = ThreadingSimpleServer(('', config['port']), RequestHandler)
+    server.is_running = False
+    server.shutdown()
 
 def start_alert_handler():
-    # Запуск обработчика алертов
+    # start_alert_handler
     while True:
         alert_file = alert_queue.get()
         logging.info('Received alert file %s', alert_file)
@@ -83,7 +93,7 @@ def start_alert_handler():
 
 
 def start_pcap_parser():
-    # Запуск парсера pcap-файлов
+    # start_pcap parser file
     while True:
         pcap_file = pcap_queue.get()
         logging.info('Received pcap file %s', pcap_file)
