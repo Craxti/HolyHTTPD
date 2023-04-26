@@ -11,6 +11,7 @@ setup(
     },
     install_requires=[
         'Flask==2.1.0',
+        'flake8',
         'pandas==1.3.4',
         'psutil==5.8.0',
         'pyshark==0.4.3.0',

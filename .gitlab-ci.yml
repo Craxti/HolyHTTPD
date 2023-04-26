@@ -1,0 +1,20 @@
+image: docker:latest
+
+services:
+  - docker:dind
+
+stages:
+  - build
+  - test
+
+build:
+  stage: build
+  script:
+    - docker build -t myproject .
+    - docker save myproject > myproject.tar
+
+pytest:
+  stage: test
+  script:
+    - docker load < myproject.tar
+    - docker run myproject python -m pytest
