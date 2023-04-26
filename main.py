@@ -2,17 +2,10 @@ import json
 import logging
 import os
 import queue
-import shutil
-import subprocess
 import threading
-import time
-import urllib.parse
 
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from socketserver import ThreadingMixIn
-
-import scapy.all as scapy
-import pyshark
 
 from modules.alert_handler import alert_handler
 from modules.packet_sniffer import PacketSniffer

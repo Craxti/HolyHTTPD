@@ -2,15 +2,17 @@ import logging
 import queue
 import threading
 from pcap_parser import pcap_parser
+import json
 
-from scapy.all import sniff
+from scapy.all import AsyncSniffer
 
 logging.basicConfig(filename='logs/packet_sniffer.log', level=logging.INFO)
 
 
 class PacketSniffer:
-    def __init__(self, pcap_queue, *args):
+    def __init__(self, pcap_queue, output_format='pcap', *args):
         self.pcap_queue = pcap_queue
+        self.output_format = output_format.lower()
         self.sniffing_thread = None
 
     def start_sniffing(self, interface=None, filter=None):
@@ -44,15 +46,23 @@ class PacketSniffer:
             self.sniffing_thread.join()
             logging.info("Packet sniffing stopped")
 
-    def _process_packet(self, packet):
-        self.pcap_queue.put(packet)
+    async def _process_packet(self, packet):
+        if self.output_format == 'json':
+            # Convert the packet to JSON format
+            json_packet = {'src': packet.ip.src, 'dst': packet.ip.dst}
+            json_packet_str = json.dumps(json_packet)
+
+            # Add the JSON packet to the queue
+            await self.pcap_queue.put(json_packet_str)
+        else:
+            # Add the packet to the queue as-is
+            await self.pcap_queue.put(packet)
 
     def _sniff(self, interface=None, filter=None):
-        try:
-            self.sniffing_thread.do_run = True
-        except AttributeError:
-            self.sniffing_thread = threading.currentThread()
-            self.sniffing_thread.do_run = True
+        sniffer = AsyncSniffer(iface=interface, filter=filter, prn=self._process_packet)
+        sniffer.start()
 
-        sniff(iface=interface, filter=filter, prn=self._process_packet,
-              stop_filter=lambda _: not self.sniffing_thread.do_run)
+        # Wait for the sniffing thread to finish
+        sniffer.join()
+
+        logging.info("Packet sniffing stopped")
