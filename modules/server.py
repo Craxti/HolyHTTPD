@@ -1,51 +1,61 @@
 import json
 import logging
-import threading
-from flask import Flask, request
+import asyncio
+import concurrent.futures
+from flask import Flask, request, jsonify
 
 app = Flask(__name__)
 
-# Чтение конфигурационного файла
+# Read config file
 with open('config.json') as f:
     config = json.load(f)
 
-# Настройка логгера
+# Configure logger
 logging.basicConfig(filename='logs/access.log', level=logging.INFO)
+
+# Define thread pool executor
+executor = concurrent.futures.ThreadPoolExecutor(max_workers=config['max_workers'])
 
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
     if request.method == 'POST':
         logging.info('Received POST request from %s', request.remote_addr)
-        # Обработка POST-запроса
-        t = threading.Thread(target=handle_post_request, args=(request,))
-        t.start()
+        # Process POST request asynchronously
+        asyncio.ensure_future(handle_post_request(request))
         return 'OK', 200
 
     logging.warning('Received GET request from %s', request.remote_addr)
-    # Обработка GET-запроса
-    t = threading.Thread(target=handle_get_request, args=(request,))
-    t.start()
+    # Process GET request asynchronously
+    asyncio.ensure_future(handle_get_request(request))
     return '', 200
 
 
-def handle_post_request(request):
-    # Обработка POST-запроса
+async def handle_post_request(request):
+    # Process POST request
     try:
-        data = request.get_json()
-        # Добавить обработку полученных данных
+        data = await loop.run_in_executor(executor, request.get_json)
+        # Add processing of received data here
         logging.info('Processed POST request from %s', request.remote_addr)
     except BaseException:
         logging.warning(
             'Error processing POST request from %s',
             request.remote_addr)
 
-
-def handle_get_request(request):
-    # Обработка GET-запроса
+async def handle_get_request(request):
+    # Process GET request
     try:
-        # Добавить обработку полученных данных
-        logging.info('Processed GET request from %s', request.remote_addr)
+        # Add processing of received data here
+        response_data = {}
+        response_data['message'] = 'Processed GET request'
+        response_data['client_ip'] = request.remote_addr
+        response_data['user_agent'] = request.user_agent.string
+
+        format_type = request.args.get('format', 'json')
+        if format_type == 'json':
+            return jsonify(response_data)
+        else:
+            return str(response_data)
     except BaseException:
         logging.warning(
             'Error processing GET request from %s',
@@ -53,4 +63,5 @@ def handle_get_request(request):
 
 
 if __name__ == '__main__':
+    loop = asyncio.get_event_loop()
     app.run(debug=config['debug'], host=config['host'], port=config['port'])
