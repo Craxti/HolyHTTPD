@@ -1,0 +1,11 @@
+[MASTER]
+disable = C0114,C0115,C0116,C0301,C0411
+
+[MESSAGES CONTROL]
+disable=fixme,invalid-name,missing-docstring,no-member,no-self-use,too-few-public-methods,too-many-arguments,too-many-branches,too-many-instance-attributes,too-many-locals,too-many-public-methods,too-many-statements
+
+[BASIC]
+good-names=i,j,k,ex,Run,_
+
+[FORMAT]
+max-line-length = 120

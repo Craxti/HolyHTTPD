@@ -1,53 +1,52 @@
-**Fake Server**
+HolyHTTPD is a Python-based web server framework. It makes it easy to set up fake web servers and web services, respond with the precise data you want, and record the requests given to it. HoneyHTTPD allows you to build your responses with Python at the HTTP protocol level to imitate almost any server or service you want. No complex setups and proxies required!
 
-## Table of Contents
+This information can be logged to different places, the currently supported outputs are:
+* Files
+* ElasticSearch
+* Stdout
+* AWS S3
 
-- [Installation](#installation)
-- [Usage](#usage)
-- [Features](#features)
-- [Contributing](#contributing)
-- [License](#license)
+HoneyPoke supports both Python 2.7 (I know its EOL, but just in case) and Python 3.
 
-[![N|Solid](https://cldup.com/dTxpPi9lDf.thumb.png)](https://nodesource.com/products/nsolid)
+## Installation
 
-This is a Python-based fake web server designed to be used as a honeypot or decoy server for catching attackers or search engine bots. The server listens on a user-defined port and logs all incoming requests to a CSV file.
+1. Clone or download this repo
+2. Install dependencies: 
+    * Python 2: `sudo pip install -r requirements.txt` 
+    * Python 3: `sudo pip3 install -r requirements.txt` 
+3. Be sure the `large` and `logs` directories are writeable by the user and group you plan to have HoneyHTTPD running under.
 
-You can install these packages using pip with the provided requirements.txt file.
+## Setup
 
-`pip install -r requirements.txt`
+1. Copy `config.json.default`  to `config.json` Modify the config file. 
+    * `loggers` enables and disables loggers. This done with the `active` key under the respective loggers. Some may need extra configuation, which is in the `config` key.
+    * `servers` contains a list of servers you want to run. Each entry has the following keys:
+        * `handler` indicates the server module in the `servers` directory to use for that port
+        * `mode` is either `http` or `https` which indicates if the server should return normal HTTP or HTTPS
+        * `port` is the port to run on 
+        * `domain` indicates the "domain" this server is running 
+        * `timeout` is the timeout for requests 
+        * `cert_path` is only required when in `https` mode. This is the path to the server certificate in the PEM format.
+    * `user` is the user you want the script to drop privileges to
+    * `group` is the group you want the script to drop privileges to
+2. Run HoneyHTTPD with:
+    * Python 2 `sudo python2 start.py --config config.json`
+    * Python 3 `sudo python3 start.py --config config.json`
 
-**Usage**
+## Making Server Modules
 
-To start the fake web server, run the following command:
+Server modules live in the `servers` directory. They are classes that handle the HTTP requests. These modules must inherit from the `Server` class in `lib.server`. The class name and the name of the server module file must be the same. Modules can inherit from other server modules to build on their functionality.
 
-`python main.py`
+## Generating SSL certificates
 
-This will start the server on the default port 8080. If you want to use a different port, specify it as a command-line argument:
+```
+openssl req -new -x509 -keyout server.pem -out server.pem -days 365 -nodes
+```
 
-`python main.py --port 1234`
+## Contributing
 
-The server logs all incoming requests to a CSV file named access.log, which is located in the same directory as the main script. You can view the log file using any text editor or spreadsheet application.
+Go at it! Open an issue, make a pull request, fork it, etc.
 
-In addition to logging requests, the server can also capture and analyze network traffic using Suricata and PyShark. To enable this feature, install Suricata and PyShark and set the ENABLE_NETWORK_CAPTURE configuration option to True in config.yaml.
+## License
 
-**Configuration**
-
-The server can be configured using the config.yaml file. Here are the available configuration options:
-
-- `port`: The port number to listen on (default: 8080).
-
-- `enable_logging`: Whether to enable logging of incoming requests (default: True).
-
-- `log_file`: The name of the file to write access logs to (default: access.log).
-
-- `alert_queue`: The name of the directory to store alert files in (default: queue/alerts).
-
-- `pcap_queue`: The name of the directory to store pcap files in (default: queue/pcap).
-
-- `enable_network_capture`: Whether to enable capturing and analyzing network traffic (default: False).
-
-- `suricata_path`: The path to the Suricata binary (default: suricata).
-
-- `suricata_rules_path`: The path to the directory containing Suricata rules (default: rules).
-
-- `packet_capture_duration`: The duration of each packet capture (in seconds) (default: 10).
+This project is licensed under the Mozilla Public License, v2.0 (formerly GPL 3.0)

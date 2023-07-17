@@ -1,8 +1,0 @@
-[tool.black]
-line-length = 88
-target-version = ['py36', 'py37', 'py38', 'py39', 'py310']
-
-[tool.isort]
-profile = "black"
-known_third_party = ["flask", "pyshark", "pytz", "pytest", "requests", "scapy"]
-known_first_party = ["alert_handler", "packet_sniffer", "pcap_parser", "server"]

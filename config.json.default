@@ -1,0 +1,28 @@
+{
+    "loggers": {
+        "ElasticSearchLogger": {
+            "active": false,
+            "config": {
+                "server": "http://USERNAME:PASSWORD@ELASTICSEARCH_SERVER",
+		        "verify": false
+            }
+        }, 
+        "FileLogger": {
+            "active": true
+        },
+         "S3Logger": {
+            "active": false,
+            "config": {
+                "key_id": "",
+                "key": "",
+                "bucket": ""
+            }
+        }
+    },
+    "servers" : [
+        {"handler": "ApacheServer", "mode": "https", "port": 8443, "domain": "example.com", "timeout": 10, "cert_path": "server.pem"},
+        {"handler": "ApacheServer", "mode": "http", "port": 8000, "domain": "example.com", "timeout": 10}
+    ],
+    "user": "nobody",
+    "group": "nogroup"
+}
