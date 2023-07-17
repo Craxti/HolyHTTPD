@@ -1,6 +1,8 @@
 import json
 import logging
 import threading
+import smtplib
+from email.mime.text import MIMEText
 from datetime import datetime
 
 # Read config file
@@ -49,11 +51,54 @@ def alert_handler(alert_file):
     t.start()
 
 
+import smtplib
+from email.mime.text import MIMEText
+
 def process_alert(alert):
-    # Здесь происходит обработка алерта
-    # Например, отправка уведомления на почту
-    # Или добавление информации об алерте в базу данных
-    pass
+    email_subject = "ALERT: {id}".format(id=alert["id"])
+    email_body = """
+        Alert ID: {id}
+        Time: {time}
+        Message: {message}
+        Source IP: {src_ip}
+        Destination IP: {dst_ip}
+        Protocol: {protocol}
+        Port: {port}
+    """.format(
+        id=alert["id"],
+        time=datetime.fromtimestamp(alert["timestamp"]).strftime("%Y-%m-%d %H:%M:%S"),
+        message=alert["message"],
+        src_ip=alert["src_ip"],
+        dst_ip=alert["dst_ip"],
+        protocol=alert["protocol"],
+        port=alert["port"],
+    )
+
+    smtp_server = "your_smtp_server"
+    smtp_port = 587
+    smtp_username = "your_username"
+    smtp_password = "your_password"
+    sender_email = "sender@example.com"
+    recipient_email = "recipient@example.com"
+
+    try:
+        # Создаем объект MIMEText с телом письма
+        message = MIMEText(email_body)
+        message["Subject"] = email_subject
+        message["From"] = sender_email
+        message["To"] = recipient_email
+
+        # Отправляем письмо через SMTP сервер
+        with smtplib.SMTP(smtp_server, smtp_port) as server:
+            server.starttls()
+            server.login(smtp_username, smtp_password)
+            server.send_message(message)
+
+        # alery add db
+        # database.insert(alert)
+    except Exception as e:
+        logging.warning("Error processing alert: %s", str(e))
+
 
 
 def start_alert_handlers():
