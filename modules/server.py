@@ -37,10 +37,22 @@ async def handle_post_request(request):
         data = await loop.run_in_executor(executor, request.get_json)
         # Add processing of received data here
         logging.info('Processed POST request from %s', request.remote_addr)
-    except BaseException:
-        logging.warning(
-            'Error processing POST request from %s',
-            request.remote_addr)
+        
+        # Example: Assuming the received data is a JSON object
+        # You can access the data and perform any required operations
+        if 'key' in data:
+            value = data['key']
+            # Perform some processing using the value
+            
+        # Example: Assuming you want to return a response
+        response_data = {'message': 'Data processed successfully'}
+        return jsonify(response_data), 200
+        
+    except Exception as e:
+        logging.warning('Error processing POST request from %s: %s', request.remote_addr, str(e))
+        # Example: Return an error response
+        error_data = {'error': 'Failed to process the data'}
+        return jsonify(error_data), 500
 
 async def handle_get_request(request):
     # Process GET request
@@ -53,13 +65,19 @@ async def handle_get_request(request):
 
         format_type = request.args.get('format', 'json')
         if format_type == 'json':
+            # Example: Perform additional processing on the response_data before returning JSON
+            # response_data['additional_field'] = 'Some value'
             return jsonify(response_data)
         else:
+            # Example: Perform additional processing on the response_data before returning a string
+            # response_data['additional_field'] = 'Some value'
             return str(response_data)
-    except BaseException:
-        logging.warning(
-            'Error processing GET request from %s',
-            request.remote_addr)
+
+    except Exception as e:
+        logging.warning('Error processing GET request from %s: %s', request.remote_addr, str(e))
+        # Example: Return an error response
+        error_data = {'error': 'Failed to process the request'}
+        return jsonify(error_data), 500
 
 
 if __name__ == '__main__':
