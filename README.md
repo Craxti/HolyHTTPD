@@ -11,10 +11,12 @@ HoneyPoke supports both Python 2.7 (I know its EOL, but just in case) and Python
 ## Installation
 
 1. Clone or download this repo
-2. Install dependencies: 
+   
+   `git clone https://github.com/Craxti/HolyHTTPD.git`
+3. Install dependencies: 
     * Python 2: `sudo pip install -r requirements.txt` 
     * Python 3: `sudo pip3 install -r requirements.txt` 
-3. Be sure the `large` and `logs` directories are writeable by the user and group you plan to have HoneyHTTPD running under.
+4. Be sure the `large` and `logs` directories are writeable by the user and group you plan to have HoneyHTTPD running under.
 
 ## Setup
 
